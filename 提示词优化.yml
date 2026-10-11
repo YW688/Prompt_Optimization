@@ -1,0 +1,344 @@
+app:
+  description: ''
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  icon_type: emoji
+  mode: advanced-chat
+  name: 提示词优化
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/deepseek:0.0.24@9e12eef09973667f0eaf4f082af883167e1de88740b22e71e71488d020c3778a
+    version: null
+kind: app
+version: 0.6.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        attachment_image_file_size_limit: 2
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        file_upload_limit: 20
+        image_file_batch_limit: 10
+        image_file_size_limit: 10
+        single_chunk_attachment_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        sourceType: llm
+        targetType: answer
+      id: llm-answer
+      source: llm
+      sourceHandle: source
+      target: answer
+      targetHandle: target
+      type: custom
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: knowledge-retrieval
+        targetType: llm
+      id: 1791638576391-source-llm-target
+      source: '1791638576391'
+      sourceHandle: source
+      target: llm
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: llm
+      id: 1791638538177-source-1791638612068-target
+      source: '1791638538177'
+      sourceHandle: source
+      target: '1791638612068'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: knowledge-retrieval
+      id: 1791638612068-source-1791638576391-target
+      source: '1791638612068'
+      sourceHandle: source
+      target: '1791638576391'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        selected: false
+        title: 用户输入
+        type: start
+        variables: []
+      height: 72
+      id: '1791638538177'
+      position:
+        x: 80
+        y: 282
+      positionAbsolute:
+        x: 80
+        y: 282
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - '1791638576391'
+          - result
+        memory:
+          query_prompt_template: '{{#sys.query#}}
+
+
+            {{#sys.files#}}'
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: false
+            size: 10
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: deepseek-flash
+          provider: langgenius/deepseek/deepseek
+        prompt_template:
+        - id: 5b4bd642-76b0-4f9c-8c2d-0b6b925ba3b8
+          role: system
+          text: '你是“用户提示词改写器”。你的唯一任务是把用户的原始输入，改写成一条更清晰、更完整、更专业的【用户提示词】。
+
+
+            【什么是用户提示词】
+
+            用户提示词 = 用户直接发给 AI 的请求或问题，使用用户口吻，例如：
+
+            “我是一名……，请你帮我……”
+
+            “我需要你帮我分析……”
+
+            “请根据以下信息，帮我生成……”
+
+
+            【什么是系统提示词】
+
+            系统提示词 = 给 AI 设定角色、规则、约束的指令，例如：
+
+            “你是一位资深律师……”
+
+            “#角色 #目标 #约束 #输出格式”
+
+            你绝对不能输出这种格式。
+
+
+            【硬性要求】
+
+            1. 只输出最终改写后的【用户提示词】，不要输出任何解释、标题、前言、后记。
+
+            2. 禁止输出“你是……”“#角色”“#目标”“#约束”“#输出格式”这类系统提示词结构。
+
+            3. 知识库内容只能作为“提示词工程方法参考”，不得照抄为输出内容。
+
+            4. 保留原始意图、对象、场景、关键信息，不编造事实。
+
+            5. 信息不足时用【待补充：...】标注。
+
+            6. 输出必须是用户口吻，例如“我是一名……，请你帮我……”。
+
+            7. 不要回答原始问题，只改写提示词。
+
+
+            【转换规则】
+
+            - 如果参考内容出现“你是{角色}”，你要转成“请你作为{角色}，帮我……”
+
+            - 如果参考内容出现“#目标”，你要转成“我的目标是……”
+
+            - 如果参考内容出现“#约束”，你要转成“要求：……”
+
+            - 如果参考内容出现“#输出格式”，你要转成“请按以下格式输出：……”
+
+
+            【示例】
+
+            原始用户输入：帮我写毕业设计
+
+            错误输出（系统提示词）：你是一位资深学术导师，精通论文写作……
+
+            正确输出（用户提示词）：我是一名人工智能专业本科生，正在做法律问答系统毕业设计。请你帮我梳理选题背景、研究目标、技术路线、论文结构和时间安排，并给出可执行步骤。
+
+
+            原始用户输入：劳动合同法怎么检索
+
+            错误输出（系统提示词）：你是一位法律专家，请根据知识库回答……
+
+            正确输出（用户提示词）：我是一名企业法务，需要检索劳动合同法相关条文。请你帮我整理劳动合同解除、经济补偿、竞业限制相关的法律条文和实务要点。'
+        - id: 224d5be6-b316-478d-a082-0043b126a675
+          role: user
+          text: '{{#sys.query#}}{{#1791638612068.text#}}{{#context#}}'
+        selected: false
+        title: 优化提示词
+        type: llm
+        vision:
+          enabled: false
+      height: 87
+      id: llm
+      position:
+        x: 980
+        y: 282
+      positionAbsolute:
+        x: 980
+        y: 282
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: '优化后的提示词如下：
+
+          {{#llm.text#}}
+
+          '
+        selected: false
+        title: 直接回复
+        type: answer
+        variables: []
+      height: 118
+      id: answer
+      position:
+        x: 1280
+        y: 282
+      positionAbsolute:
+        x: 1280
+        y: 282
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        dataset_ids:
+        - 8DYwfyfZNo2ebJ4PJJfzhfktLWoSFkel1Y7jDj4CthG8FuJ5lCYwERcCxm5Cbla+
+        multiple_retrieval_config:
+          reranking_enable: false
+          reranking_mode: reranking_model
+          top_k: 4
+        query_attachment_selector: []
+        query_variable_selector:
+        - '1791638538177'
+        - sys.query
+        retrieval_mode: multiple
+        selected: false
+        title: 知识检索
+        type: knowledge-retrieval
+      height: 89
+      id: '1791638576391'
+      position:
+        x: 680
+        y: 282
+      positionAbsolute:
+        x: 680
+        y: 282
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: deepseek-flash
+          provider: langgenius/deepseek/deepseek
+        prompt_template:
+        - id: 98b34a56-fefb-4884-b359-639c0ba765a7
+          role: system
+          text: '你是提示词工程师。你将收到一条原始用户提示词。
+
+            你的任务不是回答它，而是理解它，并生成：
+
+            1. 三条更专业、更完整的候选提示词；
+
+            2. 一条整合后的提示词。
+
+            必须保留原始意图、对象、场景，不要编造事实。'
+        - id: f6c5203c-0098-4fc9-b1a4-b047cd1bf1ed
+          role: user
+          text: '{{#sys.query#}}'
+        selected: false
+        title: 提取用户意图与关键词
+        type: llm
+        vision:
+          enabled: false
+      height: 87
+      id: '1791638612068'
+      position:
+        x: 380
+        y: 282
+      positionAbsolute:
+        x: 380
+        y: 282
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    viewport:
+      x: -21.789883268482413
+      y: 58.82166018158236
+      zoom: 0.7263294422827496
+  rag_pipeline_variables: []
